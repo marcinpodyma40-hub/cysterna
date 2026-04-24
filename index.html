@@ -14,16 +14,18 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;color:#1e293b;font-size:16p
 .hero p{font-size:12px;color:#94a3b8;margin-top:4px;}
 label{display:block;font-size:12px;font-weight:bold;color:#555;text-transform:uppercase;margin-top:14px;margin-bottom:4px;}
 select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:8px;background:#fff;}
-.progs{display:flex;gap:10px;margin-top:6px;}
-.prog{flex:1;padding:14px 0;font-size:22px;font-weight:bold;border:2px solid #ddd;border-radius:8px;background:#f8fafc;color:#0f1f3d;cursor:pointer;text-align:center;}
-.prog.on{background:#1a56db;border-color:#1a56db;color:#fff;}
+.produkt-box{background:#fff;border:2px solid #1a56db;border-radius:10px;padding:14px;margin-top:14px;}
+.produkt-box h3{color:#0f1f3d;font-size:15px;font-weight:900;margin-bottom:8px;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .btn{width:100%;background:#1a56db;color:#fff;border:none;border-radius:10px;padding:15px;font-size:18px;font-weight:bold;margin-top:20px;cursor:pointer;}
-.btn-green{background:#0f9d58;}
+.btn-add{width:100%;background:#0f9d58;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:bold;margin-top:10px;cursor:pointer;}
+.btn-remove{background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;float:right;}
 .ok{text-align:center;padding:48px 20px;}
 .ok-ico{font-size:64px;margin-bottom:16px;}
 .sheets-box{background:#fff;border:2px solid #0f9d58;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;}
-.sheets-box p{font-size:13px;color:#666;margin-bottom:10px;}
+.prog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px;}
+.prog{padding:10px 0;font-size:16px;font-weight:bold;border:2px solid #ddd;border-radius:8px;background:#f8fafc;color:#0f1f3d;cursor:pointer;text-align:center;}
+.prog.on{background:#1a56db;border-color:#1a56db;color:#fff;}
 </style>
 </head>
 <body>
@@ -36,7 +38,6 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
   </div>
 </div>
 
-<!-- FORMULARZ -->
 <div id="tab-form" class="page">
   <div id="form-main">
     <div class="hero"><h2>NOWY WPIS</h2><p>Wypełnij dane po zakończeniu trasy</p></div>
@@ -68,27 +69,6 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
     <label>Nr dokumentu WZ *</label>
     <input type="text" id="wz" placeholder="np. WZ/2025/0123">
 
-    <label>Rodzaj paliwa *</label>
-    <select id="paliwo">
-      <option value="">– wybierz –</option>
-      <option>ON – Olej napędowy</option>
-      <option>PB95 – Benzyna</option>
-      <option>Olej opałowy</option>
-    </select>
-
-    <label>Program rozlewania *</label>
-    <div class="progs">
-      <div class="prog" id="p13" onclick="selProg(13)">13</div>
-      <div class="prog" id="p14" onclick="selProg(14)">14</div>
-      <div class="prog" id="p15" onclick="selProg(15)">15</div>
-    </div>
-
-    <label>Załadunek [L] *</label>
-    <input type="number" id="zal" placeholder="0" inputmode="numeric">
-
-    <label>Wylew do klientów [L] *</label>
-    <input type="number" id="wylew" placeholder="0" inputmode="numeric">
-
     <div class="row2" style="margin-top:14px;">
       <div>
         <label style="margin-top:0">Km start *</label>
@@ -100,6 +80,9 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
       </div>
     </div>
 
+    <div id="produkty"></div>
+
+    <button class="btn-add" onclick="dodajProdukt()" id="btn-dodaj">+ Dodaj produkt</button>
     <button class="btn" onclick="wyslij()">✓ WYŚLIJ DANE</button>
     <div style="height:24px"></div>
   </div>
@@ -107,12 +90,11 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
   <div id="ok-screen" style="display:none;" class="ok">
     <div class="ok-ico">✅</div>
     <h2 style="color:#0f1f3d;margin-bottom:8px;">Wysłano!</h2>
-    <p style="color:#666;margin-bottom:24px;" id="ok-msg">Dane trafiły do Google Sheets.</p>
+    <p style="color:#666;margin-bottom:24px;" id="ok-msg">Dane wysłane do Google Sheets!</p>
     <button class="btn" style="width:auto;padding:12px 32px;" onclick="resetForm()">+ Nowy wpis</button>
   </div>
 </div>
 
-<!-- BIURO -->
 <div id="tab-admin" class="page" style="display:none;">
   <div class="hero"><h2>PANEL BIURA</h2><p>Dane kierowców w Google Sheets</p></div>
   <div class="sheets-box">
@@ -122,21 +104,105 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
 </div>
 
 <script>
-var prog = null;
-document.getElementById('data').valueAsDate = new Date();
+// Programy i ich współczynniki (litry ubytku na 100L)
+var PROGRAMY = {
+  ON:  [{nr:11,typ:'RZ',wsp:2},{nr:12,typ:'RZ',wsp:3},{nr:13,typ:'RZ',wsp:4},{nr:14,typ:'15',wsp:2},{nr:15,typ:'15',wsp:3},{nr:16,typ:'15',wsp:4}],
+  PB:  [{nr:17,typ:'RZ',wsp:2},{nr:18,typ:'15',wsp:2}],
+  OP:  [{nr:21,typ:'RZ',wsp:2},{nr:22,typ:'15',wsp:2}]
+};
 
-function showTab(t) {
-  document.getElementById('tab-form').style.display = t==='form'?'block':'none';
-  document.getElementById('tab-admin').style.display = t==='admin'?'block':'none';
-  document.getElementById('btn-form').style.background = t==='form'?'#1a56db':'transparent';
-  document.getElementById('btn-form').style.color = t==='form'?'#fff':'#94a3b8';
-  document.getElementById('btn-admin').style.background = t==='admin'?'#1a56db':'transparent';
-  document.getElementById('btn-admin').style.color = t==='admin'?'#fff':'#94a3b8';
+var produktCount = 0;
+var selectedProgs = {};
+
+document.getElementById('data').valueAsDate = new Date();
+dodajProdukt();
+
+function getPaliwoKey(val) {
+  if(val.indexOf('ON')>-1) return 'ON';
+  if(val.indexOf('PB')>-1) return 'PB';
+  if(val.indexOf('Olej opałowy')>-1) return 'OP';
+  return null;
 }
 
-function selProg(n) {
-  prog = n;
-  [13,14,15].forEach(function(x){ document.getElementById('p'+x).className='prog'+(x===n?' on':''); });
+function dodajProdukt() {
+  if(produktCount >= 3) { alert('Maksymalnie 3 produkty!'); return; }
+  produktCount++;
+  var id = produktCount;
+  selectedProgs[id] = null;
+
+  var div = document.createElement('div');
+  div.className = 'produkt-box';
+  div.id = 'produkt-' + id;
+  div.innerHTML =
+    '<h3>PRODUKT ' + id + (id>1?'<button class="btn-remove" onclick="usunProdukt('+id+')">✕ Usuń</button>':'') + '</h3>' +
+    '<label>Rodzaj paliwa *</label>' +
+    '<select id="pal-'+id+'" onchange="renderProgramy('+id+')">' +
+      '<option value="">– wybierz –</option>' +
+      '<option value="ON">ON – Olej napędowy</option>' +
+      '<option value="PB">PB95 – Benzyna</option>' +
+      '<option value="OP">Olej opałowy</option>' +
+    '</select>' +
+    '<label>Program rozlewania *</label>' +
+    '<div class="prog-grid" id="progi-'+id+'"><p style="color:#999;font-size:13px;">Najpierw wybierz paliwo</p></div>' +
+    '<div style="background:#f0f4f8;border-radius:8px;padding:10px;margin-top:14px;">' +
+      '<p style="font-size:12px;font-weight:bold;color:#0f1f3d;text-transform:uppercase;margin-bottom:8px;">📋 Załadunek (z WZ)</p>' +
+      '<div class="row2">' +
+        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="zal-rz-'+id+'" placeholder="0" inputmode="numeric"></div>' +
+        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="zal-15-'+id+'" placeholder="0" inputmode="numeric"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#fff3e0;border-radius:8px;padding:10px;margin-top:10px;">' +
+      '<p style="font-size:12px;font-weight:bold;color:#0f1f3d;text-transform:uppercase;margin-bottom:8px;">🔧 Rozlane u klientów (z licznika)</p>' +
+      '<div class="row2">' +
+        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="roz-rz-'+id+'" placeholder="0" inputmode="numeric"></div>' +
+        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="roz-15-'+id+'" placeholder="0" inputmode="numeric"></div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('produkty').appendChild(div);
+  if(produktCount >= 3) document.getElementById('btn-dodaj').style.display='none';
+}
+
+function usunProdukt(id) {
+  var el = document.getElementById('produkt-'+id);
+  if(el) el.remove();
+  delete selectedProgs[id];
+  if(produktCount >= 3) document.getElementById('btn-dodaj').style.display='block';
+  produktCount--;
+}
+
+function renderProgramy(id) {
+  var pal = document.getElementById('pal-'+id).value;
+  var cont = document.getElementById('progi-'+id);
+  selectedProgs[id] = null;
+  if(!pal) { cont.innerHTML='<p style="color:#999;font-size:13px;">Najpierw wybierz paliwo</p>'; return; }
+  var progi = PROGRAMY[pal];
+  cont.innerHTML = '';
+  progi.forEach(function(p) {
+    var btn = document.createElement('div');
+    btn.className = 'prog';
+    btn.id = 'prog-'+id+'-'+p.nr;
+    btn.innerHTML = p.nr+'<br><span style="font-size:10px;font-weight:normal;">'+p.typ+'</span>';
+    btn.onclick = function() { selProg(id, p.nr); };
+    cont.appendChild(btn);
+  });
+}
+
+function selProg(id, nr) {
+  selectedProgs[id] = nr;
+  var pal = document.getElementById('pal-'+id).value;
+  var progi = PROGRAMY[pal];
+  progi.forEach(function(p) {
+    var el = document.getElementById('prog-'+id+'-'+p.nr);
+    if(el) el.className = 'prog' + (p.nr===nr?' on':'');
+  });
+}
+
+function getProgData(palKey, nr) {
+  if(!palKey || !nr) return null;
+  var progi = PROGRAMY[palKey];
+  for(var i=0;i<progi.length;i++) { if(progi[i].nr===nr) return progi[i]; }
+  return null;
 }
 
 function wyslij() {
@@ -145,39 +211,74 @@ function wyslij() {
   var data=document.getElementById('data').value;
   var zam=document.getElementById('zam').value.trim();
   var wz=document.getElementById('wz').value.trim();
-  var paliwo=document.getElementById('paliwo').value;
-  var zal=parseFloat(document.getElementById('zal').value);
-  var wylew=parseFloat(document.getElementById('wylew').value);
   var kms=parseFloat(document.getElementById('kms').value);
   var kmk=parseFloat(document.getElementById('kmk').value);
 
-  if(!kierowca||!pojazd||!data||!zam||!wz||!paliwo||!prog||isNaN(zal)||isNaN(wylew)||isNaN(kms)||isNaN(kmk)){
-    alert('Uzupełnij wszystkie pola!'); return;
+  if(!kierowca||!pojazd||!data||!zam||!wz||isNaN(kms)||isNaN(kmk)){
+    alert('Uzupełnij wszystkie pola ogólne!'); return;
   }
   if(kmk<kms){alert('Km koniec musi być większy!');return;}
-  if(zal<=0||wylew<=0){alert('Litry muszą być większe niż 0!');return;}
 
-  var kor=+(wylew*(prog/100)).toFixed(2);
-  var skor=+(wylew+kor).toFixed(2);
-  var roz=+(zal-skor).toFixed(2);
-  var rozP=+((roz/zal)*100).toFixed(2);
-  var km=kmk-kms;
-  var stat=rozP<0?'OSZCZĘDNOŚĆ':rozP<=0.1?'OK – W NORMIE':rozP<=0.5?'PONAD NORMĘ':'DUŻY UBYTEK';
+  var ids = Object.keys(selectedProgs);
+  if(ids.length===0){alert('Dodaj przynajmniej jeden produkt!');return;}
 
-  var payload={
-    kierowca:kierowca,pojazd:pojazd,data:data,zam:zam,wz:wz,
-    paliwo:paliwo,prog:prog,zaladunek:zal,wylew:wylew,korekta:kor,
-    skorygowany:skor,roznica:roz,roznicaP:rozP,km:km,
-    kmStart:kms,kmKoniec:kmk,status:stat,ts:new Date().toLocaleString('pl-PL')
+  var produktyData = [];
+  for(var i=0;i<ids.length;i++){
+    var id = ids[i];
+    var el = document.getElementById('produkt-'+id);
+    if(!el) continue;
+    var pal = document.getElementById('pal-'+id).value;
+    var prog = selectedProgs[id];
+    var zalRZ = parseFloat(document.getElementById('zal-rz-'+id).value);
+    var zal15 = parseFloat(document.getElementById('zal-15-'+id).value);
+    var rozRZ = parseFloat(document.getElementById('roz-rz-'+id).value);
+    var roz15 = parseFloat(document.getElementById('roz-15-'+id).value);
+
+    if(!pal||!prog||isNaN(zalRZ)||isNaN(zal15)||isNaN(rozRZ)||isNaN(roz15)){
+      alert('Uzupełnij wszystkie pola dla Produktu '+id+'!'); return;
+    }
+
+    var progData = getProgData(pal, prog);
+    var wsp = progData ? progData.wsp/100 : 0;
+    var typ = progData ? progData.typ : '';
+
+    // Obliczenia na podstawie typu programu
+    var zalUzyty = typ==='15' ? zal15 : zalRZ;
+    var rozUzyty = typ==='15' ? roz15 : rozRZ;
+    var normaUbytek = +(zalUzyty * wsp).toFixed(2);
+    var roznica = +(zalUzyty - rozUzyty).toFixed(2);
+    var roznicaNetto = +(roznica - normaUbytek).toFixed(2);
+    var status = roznicaNetto < 0 ? 'OSZCZĘDNOŚĆ' : roznicaNetto <= 10 ? 'OK – W NORMIE' : roznicaNetto <= 50 ? 'PONAD NORMĘ' : 'DUŻY UBYTEK';
+
+    produktyData.push({
+      nrProduktu: i+1,
+      paliwo: pal,
+      program: prog,
+      typProg: typ,
+      zaladunek_RZ: zalRZ,
+      zaladunek_15: zal15,
+      rozlane_RZ: rozRZ,
+      rozlane_15: roz15,
+      normaUbytek: normaUbytek,
+      roznica: roznica,
+      roznicaNetto: roznicaNetto,
+      status: status
+    });
+  }
+
+  var payload = {
+    kierowca:kierowca, pojazd:pojazd, data:data, zam:zam, wz:wz,
+    kmStart:kms, kmKoniec:kmk, km:kmk-kms,
+    produkty: produktyData,
+    ts: new Date().toLocaleString('pl-PL')
   };
 
   fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
-    method:'POST',mode:'no-cors',
+    method:'POST', mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)
   }).catch(function(){});
 
-  document.getElementById('ok-msg').textContent='Dane wysłane do Google Sheets!';
   document.getElementById('form-main').style.display='none';
   document.getElementById('ok-screen').style.display='block';
 }
@@ -188,20 +289,29 @@ function resetForm() {
   document.getElementById('data').valueAsDate=new Date();
   document.getElementById('zam').value='';
   document.getElementById('wz').value='';
-  document.getElementById('paliwo').value='';
-  document.getElementById('zal').value='';
-  document.getElementById('wylew').value='';
   document.getElementById('kms').value='';
   document.getElementById('kmk').value='';
-  prog=null;
-  [13,14,15].forEach(function(x){document.getElementById('p'+x).className='prog';});
+  document.getElementById('produkty').innerHTML='';
+  produktCount=0;
+  selectedProgs={};
+  document.getElementById('btn-dodaj').style.display='block';
   document.getElementById('form-main').style.display='block';
   document.getElementById('ok-screen').style.display='none';
+  dodajProdukt();
+}
+
+function showTab(t) {
+  document.getElementById('tab-form').style.display = t==='form'?'block':'none';
+  document.getElementById('tab-admin').style.display = t==='admin'?'block':'none';
+  document.getElementById('btn-form').style.background = t==='form'?'#1a56db':'transparent';
+  document.getElementById('btn-form').style.color = t==='form'?'#fff':'#94a3b8';
+  document.getElementById('btn-admin').style.background = t==='admin'?'#1a56db':'transparent';
+  document.getElementById('btn-admin').style.color = t==='admin'?'#fff':'#94a3b8';
 }
 </script>
-
 </body>
 </html>
+    
   
      
     
