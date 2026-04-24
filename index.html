@@ -1,1 +1,205 @@
 
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cysterna App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#f0f4f8;color:#1e293b;font-size:16px;}
+.bar{background:#0f1f3d;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+.page{padding:14px;max-width:480px;margin:0 auto;}
+.hero{background:#0f1f3d;color:#fff;border-radius:10px;padding:16px;margin-bottom:14px;}
+.hero h2{font-size:22px;font-weight:900;}
+.hero p{font-size:12px;color:#94a3b8;margin-top:4px;}
+label{display:block;font-size:12px;font-weight:bold;color:#555;text-transform:uppercase;margin-top:14px;margin-bottom:4px;}
+select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:8px;background:#fff;}
+.progs{display:flex;gap:10px;margin-top:6px;}
+.prog{flex:1;padding:14px 0;font-size:22px;font-weight:bold;border:2px solid #ddd;border-radius:8px;background:#f8fafc;color:#0f1f3d;cursor:pointer;text-align:center;}
+.prog.on{background:#1a56db;border-color:#1a56db;color:#fff;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{width:100%;background:#1a56db;color:#fff;border:none;border-radius:10px;padding:15px;font-size:18px;font-weight:bold;margin-top:20px;cursor:pointer;}
+.btn-green{background:#0f9d58;}
+.ok{text-align:center;padding:48px 20px;}
+.ok-ico{font-size:64px;margin-bottom:16px;}
+.sheets-box{background:#fff;border:2px solid #0f9d58;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;}
+.sheets-box p{font-size:13px;color:#666;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<div class="bar">
+<b style="font-size:18px;letter-spacing:1px;">🚛 CYSTERNA<span style="color:#f59e0b;">.</span>APP</b>
+<div>
+<button onclick="showTab('form')" id="btn-form" style="background:#1a56db;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-weight:bold;font-size:13px;cursor:pointer;margin-right:4px;">Formularz</button>
+<button onclick="showTab('admin')" id="btn-admin" style="background:transparent;color:#94a3b8;border:none;border-radius:6px;padding:6px 12px;font-weight:bold;font-size:13px;cursor:pointer;">Biuro</button>
+</div>
+</div>
+
+<!-- FORMULARZ -->
+<div id="tab-form" class="page">
+<div id="form-main">
+<div class="hero"><h2>NOWY WPIS</h2><p>Wypełnij dane po zakończeniu trasy</p></div>
+
+<label>Kierowca *</label>
+<select id="kierowca">
+<option value="">– wybierz –</option>
+<option>Wojtek</option>
+<option>Jakub</option>
+<option>Szczepan</option>
+</select>
+
+<label>Pojazd *</label>
+<select id="pojazd">
+<option value="">– wybierz –</option>
+<option>1 – PO6S361 / PKN472XC – DAF</option>
+<option>2 – PKN99959 / PKN294XH</option>
+<option>3 – PKN78456</option>
+<option>4 – PKN67518 / PKN142XA</option>
+<option>5 – PKN43062 – DAF</option>
+</select>
+
+<label>Data trasy *</label>
+<input type="date" id="data">
+
+<label>Nr zamówienia *</label>
+<input type="text" id="zam" placeholder="np. ZAM/2025/001">
+
+<label>Nr dokumentu WZ *</label>
+<input type="text" id="wz" placeholder="np. WZ/2025/0123">
+
+<label>Rodzaj paliwa *</label>
+<select id="paliwo">
+<option value="">– wybierz –</option>
+<option>ON – Olej napędowy</option>
+<option>PB95 – Benzyna</option>
+<option>Olej opałowy</option>
+</select>
+
+<label>Program rozlewania *</label>
+<div class="progs">
+<div class="prog" id="p13" onclick="selProg(13)">13</div>
+<div class="prog" id="p14" onclick="selProg(14)">14</div>
+<div class="prog" id="p15" onclick="selProg(15)">15</div>
+</div>
+
+<label>Załadunek [L] *</label>
+<input type="number" id="zal" placeholder="0" inputmode="numeric">
+
+<label>Wylew do klientów [L] *</label>
+<input type="number" id="wylew" placeholder="0" inputmode="numeric">
+
+<div class="row2" style="margin-top:14px;">
+<div>
+<label style="margin-top:0">Km start *</label>
+<input type="number" id="kms" placeholder="0" inputmode="numeric">
+</div>
+<div>
+<label style="margin-top:0">Km koniec *</label>
+<input type="number" id="kmk" placeholder="0" inputmode="numeric">
+</div>
+</div>
+
+<button class="btn" onclick="wyslij()">✓ WYŚLIJ DANE</button>
+<div style="height:24px"></div>
+</div>
+
+<div id="ok-screen" style="display:none;" class="ok">
+<div class="ok-ico">✅</div>
+<h2 style="color:#0f1f3d;margin-bottom:8px;">Wysłano!</h2>
+<p style="color:#666;margin-bottom:24px;" id="ok-msg">Dane trafiły do Google Sheets.</p>
+<button class="btn" style="width:auto;padding:12px 32px;" onclick="resetForm()">+ Nowy wpis</button>
+</div>
+</div>
+
+<!-- BIURO -->
+<div id="tab-admin" class="page" style="display:none;">
+<div class="hero"><h2>PANEL BIURA</h2><p>Dane kierowców w Google Sheets</p></div>
+<div class="sheets-box">
+<p>Wszystkie wpisy kierowców są tutaj:</p>
+<a href="https://docs.google.com/spreadsheets/d/1PSgKxHIP-hN9-urvQ9CIBcGyMB_kMA-kFvWlg3TVX-8/edit" target="_blank" style="display:inline-block;background:#0f9d58;color:#fff;border-radius:8px;padding:12px 24px;font-weight:bold;font-size:16px;text-decoration:none;">📊 Otwórz Google Sheets</a>
+</div>
+</div>
+
+<script>
+var prog = null;
+document.getElementById('data').valueAsDate = new Date();
+
+function showTab(t) {
+document.getElementById('tab-form').style.display = t==='form'?'block':'none';
+document.getElementById('tab-admin').style.display = t==='admin'?'block':'none';
+document.getElementById('btn-form').style.background = t==='form'?'#1a56db':'transparent';
+document.getElementById('btn-form').style.color = t==='form'?'#fff':'#94a3b8';
+document.getElementById('btn-admin').style.background = t==='admin'?'#1a56db':'transparent';
+document.getElementById('btn-admin').style.color = t==='admin'?'#fff':'#94a3b8';
+}
+
+function selProg(n) {
+prog = n;
+[13,14,15].forEach(function(x){ document.getElementById('p'+x).className='prog'+(x===n?' on':''); });
+}
+
+function wyslij() {
+var kierowca=document.getElementById('kierowca').value;
+var pojazd=document.getElementById('pojazd').value;
+var data=document.getElementById('data').value;
+var zam=document.getElementById('zam').value.trim();
+var wz=document.getElementById('wz').value.trim();
+var paliwo=document.getElementById('paliwo').value;
+var zal=parseFloat(document.getElementById('zal').value);
+var wylew=parseFloat(document.getElementById('wylew').value);
+var kms=parseFloat(document.getElementById('kms').value);
+var kmk=parseFloat(document.getElementById('kmk').value);
+
+if(!kierowca||!pojazd||!data||!zam||!wz||!paliwo||!prog||isNaN(zal)||isNaN(wylew)||isNaN(kms)||isNaN(kmk)){
+alert('Uzupełnij wszystkie pola!'); return;
+}
+if(kmk<kms){alert('Km koniec musi być większy!');return;}
+if(zal<=0||wylew<=0){alert('Litry muszą być większe niż 0!');return;}
+
+var kor=+(wylew*(prog/100)).toFixed(2);
+var skor=+(wylew+kor).toFixed(2);
+var roz=+(zal-skor).toFixed(2);
+var rozP=+((roz/zal)*100).toFixed(2);
+var km=kmk-kms;
+var stat=rozP<0?'OSZCZĘDNOŚĆ':rozP<=0.1?'OK – W NORMIE':rozP<=0.5?'PONAD NORMĘ':'DUŻY UBYTEK';
+
+var payload={
+kierowca:kierowca,pojazd:pojazd,data:data,zam:zam,wz:wz,
+paliwo:paliwo,prog:prog,zaladunek:zal,wylew:wylew,korekta:kor,
+skorygowany:skor,roznica:roz,roznicaP:rozP,km:km,
+kmStart:kms,kmKoniec:kmk,status:stat,ts:new Date().toLocaleString('pl-PL')
+};
+
+fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
+method:'POST',mode:'no-cors',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(payload)
+}).catch(function(){});
+
+document.getElementById('ok-msg').textContent='Dane wysłane do Google Sheets!';
+document.getElementById('form-main').style.display='none';
+document.getElementById('ok-screen').style.display='block';
+}
+
+function resetForm() {
+document.getElementById('kierowca').value='';
+document.getElementById('pojazd').value='';
+document.getElementById('data').valueAsDate=new Date();
+document.getElementById('zam').value='';
+document.getElementById('wz').value='';
+document.getElementById('paliwo').value='';
+document.getElementById('zal').value='';
+document.getElementById('wylew').value='';
+document.getElementById('kms').value='';
+document.getElementById('kmk').value='';
+prog=null;
+[13,14,15].forEach(function(x){document.getElementById('p'+x).className='prog';});
+document.getElementById('form-main').style.display='block';
+document.getElementById('ok-screen').style.display='none';
+}
+</script>
+
+</body>
+</html>
