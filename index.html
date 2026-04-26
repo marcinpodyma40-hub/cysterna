@@ -1,211 +1,953 @@
-<!DOCTYPE html>
+!DOCTYPE html>
+
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cysterna App</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Arial,sans-serif;background:#f0f4f8;color:#1e293b;font-size:16px;}
-.bar{background:#0f1f3d;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
-.page{padding:14px;max-width:480px;margin:0 auto;}
-.hero{background:#0f1f3d;color:#fff;border-radius:10px;padding:16px;margin-bottom:14px;}
-.hero h2{font-size:22px;font-weight:900;}
+body{font-family:'Barlow',sans-serif;background:#f1f5f9;color:#1e293b;font-size:16px;min-height:100vh;}
+.bar{background:#1e3a8a;border-bottom:3px solid #2563eb;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+.bar-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:2px;color:#fff;}
+.bar-title span{color:#f59e0b;}
+.tabs{display:flex;gap:3px;flex-wrap:wrap;}
+.tab-btn{background:transparent;color:#93c5fd;border:1px solid #3b82f6;border-radius:6px;padding:6px 10px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .2s;}
+.tab-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.page{padding:14px;max-width:480px;margin:0 auto;display:none;}
+.page.active{display:block;}
+.hero{background:linear-gradient(135deg,#0f1f3d 0%,#1a3560 100%);border-radius:12px;padding:18px;margin-bottom:16px;}
+.hero h2{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;letter-spacing:2px;color:#fff;}
 .hero p{font-size:12px;color:#94a3b8;margin-top:4px;}
-label{display:block;font-size:12px;font-weight:bold;color:#555;text-transform:uppercase;margin-top:14px;margin-bottom:4px;}
-select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:8px;background:#fff;}
-.produkt-box{background:#fff;border:2px solid #1a56db;border-radius:10px;padding:14px;margin-top:14px;}
-.produkt-box h3{color:#0f1f3d;font-size:15px;font-weight:900;margin-bottom:8px;}
+label{display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-top:14px;margin-bottom:5px;}
+select,input[type=text],input[type=number],input[type=date],input[type=email],input[type=password]{width:100%;padding:11px 12px;font-size:15px;font-family:'Barlow',sans-serif;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#1e293b;transition:border-color .2s;}
+select:focus,input:focus{outline:none;border-color:#2563eb;}
+input.error{border-color:#ef4444!important;background:#fff5f5;}
+select option{background:#fff;color:#1e293b;}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;color:#1e3a8a;text-transform:uppercase;margin-bottom:12px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.btn{width:100%;background:#1a56db;color:#fff;border:none;border-radius:10px;padding:15px;font-size:18px;font-weight:bold;margin-top:20px;cursor:pointer;}
-.btn-add{width:100%;background:#0f9d58;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:bold;margin-top:10px;cursor:pointer;}
-.btn-remove{background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;float:right;}
-.ok{text-align:center;padding:48px 20px;}
-.ok-ico{font-size:64px;margin-bottom:16px;}
-.sheets-box{background:#fff;border:2px solid #0f9d58;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.btn{width:100%;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border:none;border-radius:10px;padding:15px;font-size:17px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:16px;cursor:pointer;transition:opacity .2s;}
+.btn:hover{opacity:.9;}
+.btn-green{background:linear-gradient(135deg,#059669,#10b981);}
+.btn-orange{background:linear-gradient(135deg,#d97706,#f59e0b);}
+.btn-add{width:100%;background:#eff6ff;color:#1d4ed8;border:2px dashed #93c5fd;border-radius:10px;padding:11px;font-size:15px;font-weight:700;font-family:'Barlow',sans-serif;margin-top:10px;cursor:pointer;}
+.btn-sm{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;}
+.btn-remove{background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;float:right;font-weight:700;}
 .prog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px;}
-.prog{padding:10px 0;font-size:16px;font-weight:bold;border:2px solid #ddd;border-radius:8px;background:#f8fafc;color:#0f1f3d;cursor:pointer;text-align:center;}
-.prog.on{background:#1a56db;border-color:#1a56db;color:#fff;}
+.prog{padding:10px 0;font-size:15px;font-weight:700;border:2px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;cursor:pointer;text-align:center;transition:all .2s;}
+.prog.on{background:#1e3a8a;border-color:#1e3a8a;color:#fff;}
+.section-bg{background:#f8fafc;border-radius:8px;padding:12px;margin-top:12px;border:1px solid #e2e8f0;}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.ok{text-align:center;padding:40px 20px;}
+.ok-ico{font-size:64px;margin-bottom:16px;}
+.stat-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-top:10px;}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#1e3a8a;}
+.stat-lab{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;}
+/* Lock */
+.lock-screen{position:fixed;inset:0;background:#f1f5f9;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;}
+.lock-screen h2{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:2px;}
+.lock-screen p{color:#64748b;font-size:14px;margin-bottom:24px;text-align:center;}
+.lock-err{color:#ef4444;font-size:13px;margin-top:8px;text-align:center;font-weight:700;}
+/* Offline badge */
+.offline-bar{background:#f59e0b;color:#fff;text-align:center;padding:8px;font-weight:700;font-size:13px;display:none;}
+.offline-bar.show{display:block;}
+/* Walidacja */
+.val-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin-top:10px;display:none;}
+.val-box ul{margin-left:16px;margin-top:4px;}
+.val-box li{font-size:13px;color:#b91c1c;margin-bottom:3px;}
+/* Historia */
+.hist-item{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.hist-item h4{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:#1e3a8a;}
+.hist-meta{font-size:12px;color:#64748b;margin-top:2px;margin-bottom:8px;}
+.hist-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-right:4px;}
+.hist-ok{background:#dcfce7;color:#166534;}
+.hist-warn{background:#fef9c3;color:#854d0e;}
+.hist-bad{background:#fee2e2;color:#991b1b;}
+.hist-offline{background:#fef3c7;color:#92400e;}
+.hist-sent{background:#dbeafe;color:#1e40af;}
+/* Zdjęcia */
+.foto-box{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.foto-thumb{width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #e2e8f0;cursor:pointer;}
+.foto-label{display:flex;align-items:center;justify-content:center;width:80px;height:80px;border:2px dashed #93c5fd;border-radius:8px;cursor:pointer;background:#eff6ff;color:#2563eb;font-size:24px;}
+input[type=file]{display:none;}
+/* Koszty */
+.koszt-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;}
+.koszt-row select{flex:1;min-width:120px;}
+.koszt-row input{flex:.8;min-width:80px;}
+.koszt-row .del-btn{background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:9px 10px;cursor:pointer;font-size:14px;}
+.koszt-sum{background:#eff6ff;border-radius:8px;padding:12px 14px;margin-top:10px;border:1px solid #bfdbfe;display:flex;justify-content:space-between;align-items:center;}
+/* Kalkulator */
+.kalk-result{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px;margin-top:12px;}
+.kalk-result .big{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#166534;}
+/* Edycja modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0;}
+.modal-box{background:#f1f5f9;border-radius:16px;width:100%;max-width:460px;margin:auto;padding:16px;position:relative;}
+.modal-box .hero{margin-bottom:12px;}
+.modal-close{position:absolute;top:14px;right:14px;background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:6px 12px;font-weight:800;cursor:pointer;font-size:14px;z-index:1;}
+/* PIN ekran */
+.pin-overlay{position:fixed;inset:0;background:#f1f5f9;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;}
+.pin-overlay h2{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:2px;}
+.pin-overlay p{color:#64748b;font-size:14px;margin-bottom:24px;text-align:center;}
+.pin-dots{display:flex;gap:12px;margin-bottom:24px;}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid #94a3b8;background:transparent;transition:all .2s;}
+.pin-dot.filled{background:#1e3a8a;border-color:#1e3a8a;}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;width:100%;}
+.pin-key{padding:18px;font-size:22px;font-weight:800;font-family:'Barlow Condensed',sans-serif;border:2px solid #e2e8f0;border-radius:12px;background:#fff;color:#1e293b;cursor:pointer;text-align:center;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.pin-key:active{background:#1e3a8a;color:#fff;border-color:#1e3a8a;transform:scale(.95);}
+.pin-key.del{background:#fee2e2;color:#b91c1c;border-color:#fecaca;}
+.pin-err{color:#ef4444;font-size:13px;font-weight:700;margin-top:12px;min-height:20px;text-align:center;}
+/* Kierowca buttons */
+.kierowca-btn{padding:14px 8px;font-size:15px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;color:#475569;cursor:pointer;transition:all .2s;width:100%;}
+.kierowca-btn.active{background:#1e3a8a;border-color:#1e3a8a;color:#fff;}
+/* Mail */
+.mail-car{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px;}
+.mail-car h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#1e3a8a;margin-bottom:2px;}
+.mail-car .reg{font-size:12px;color:#64748b;margin-bottom:10px;}
+.gmail-btn{display:block;width:100%;padding:12px;background:#ea4335;color:#fff;border:none;border-radius:8px;font-weight:800;font-size:15px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;text-align:center;text-decoration:none;}
 </style>
 </head>
 <body>
 
+<div class="offline-bar" id="offline-bar">⚠️ BRAK INTERNETU – dane zapisane lokalnie, wyślemy automatycznie gdy wróci zasięg</div>
+
+<!-- LOCK -->
+
+<div class="lock-screen" id="lock-screen" style="display:none;">
+  <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+  <h2>PANEL BIURA</h2>
+  <p>Dostęp tylko dla administratora.<br>Wpisz hasło aby kontynuować.</p>
+  <input type="password" id="haslo-input" placeholder="Hasło..." style="max-width:300px;text-align:center;" onkeydown="if(event.key==='Enter')sprawdzHaslo()">
+  <button class="btn" style="max-width:300px;margin-top:10px;" onclick="sprawdzHaslo()">🔓 WEJDŹ</button>
+  <div class="lock-err" id="lock-err"></div>
+  <button onclick="anulujBiuro()" style="margin-top:16px;background:transparent;color:#64748b;border:none;cursor:pointer;font-size:14px;">← Wróć</button>
+</div>
+
 <div class="bar">
-  <b style="font-size:18px;letter-spacing:1px;">🚛 CYSTERNA<span style="color:#f59e0b;">.</span>APP</b>
-  <div>
-    <button onclick="showTab('form')" id="btn-form" style="background:#1a56db;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-weight:bold;font-size:13px;cursor:pointer;margin-right:4px;">Formularz</button>
-    <button onclick="showTab('admin')" id="btn-admin" style="background:transparent;color:#94a3b8;border:none;border-radius:6px;padding:6px 12px;font-weight:bold;font-size:13px;cursor:pointer;">Biuro</button>
+  <div class="bar-title">🚛 CYSTERNA<span>.</span>APP</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="goTab('form')" id="tb-form">📋 Trasa</button>
+    <button class="tab-btn" onclick="goTab('hist')" id="tb-hist">📜 Historia</button>
+    <button class="tab-btn" onclick="goTab('mail')" id="tb-mail">📧 Poczta</button>
+    <button class="tab-btn" onclick="goTab('admin')" id="tb-admin">🏢 Biuro</button>
   </div>
 </div>
 
-<div id="tab-form" class="page">
+<!-- ===== FORMULARZ ===== -->
+
+<div class="page active" id="tab-form">
   <div id="form-main">
     <div class="hero"><h2>NOWY WPIS</h2><p>Wypełnij dane po zakończeniu trasy</p></div>
 
-    <label>Kierowca *</label>
-    <select id="kierowca">
-      <option value="">– wybierz –</option>
-      <option>Wojtek</option>
-      <option>Jakub</option>
-      <option>Szczepan</option>
-    </select>
+```
+<div class="val-box" id="val-box">
+  <b style="color:#b91c1c;">❌ Uzupełnij brakujące pola:</b>
+  <ul id="val-list"></ul>
+</div>
 
-    <label>Pojazd *</label>
-    <select id="pojazd">
-      <option value="">– wybierz –</option>
-      <option>1 – PO6S361 / PKN472XC – DAF</option>
-      <option>2 – PKN99959 / PKN294XH</option>
-      <option>3 – PKN78456</option>
-      <option>4 – PKN67518 / PKN142XA</option>
-      <option>5 – PKN43062 – DAF</option>
-    </select>
+<label>Kierowca *</label>
+<select id="kierowca">
+  <option value="">– wybierz –</option>
+  <option>Wojtek</option>
+  <option>Jakub</option>
+  <option>Szczepan</option>
+</select>
 
-    <label>Data trasy *</label>
-    <input type="date" id="data">
+<label>Pojazd *</label>
+<select id="pojazd">
+  <option value="">– wybierz –</option>
+  <option value="PO6S361">1 – PO6S361 / PKN472XC – DAF</option>
+  <option value="PKN99959">2 – PKN99959 / PKN294XH</option>
+  <option value="PKN78456">3 – PKN78456</option>
+  <option value="PKN67518">4 – PKN67518 / PKN142XA</option>
+  <option value="PKN43062">5 – PKN43062 – DAF</option>
+</select>
 
-    <label>Nr zamówienia *</label>
-    <input type="text" id="zam" placeholder="np. ZAM/2025/001">
+<label>Data trasy *</label>
+<input type="date" id="data">
 
-    <label>Nr dokumentu WZ *</label>
-    <input type="text" id="wz" placeholder="np. WZ/2025/0123">
+<label>Nr zamówienia *</label>
+<input type="text" id="zam" placeholder="np. ZAM/2025/001">
 
-    <div class="row2" style="margin-top:14px;">
-      <div>
-        <label style="margin-top:0">Km start *</label>
-        <input type="number" id="kms" placeholder="0" inputmode="numeric">
-      </div>
-      <div>
-        <label style="margin-top:0">Km koniec *</label>
-        <input type="number" id="kmk" placeholder="0" inputmode="numeric">
-      </div>
-    </div>
+<label>Nr dokumentu WZ *</label>
+<input type="text" id="wz" placeholder="np. WZ/2025/0123">
 
-    <div id="produkty"></div>
+<div class="row2" style="margin-top:14px;">
+  <div><label style="margin-top:0">Km start *</label><input type="number" id="kms" placeholder="0" inputmode="numeric" oninput="obliczSpalanie()"></div>
+  <div><label style="margin-top:0">Km koniec *</label><input type="number" id="kmk" placeholder="0" inputmode="numeric" oninput="obliczSpalanie()"></div>
+</div>
 
-    <button class="btn-add" onclick="dodajProdukt()" id="btn-dodaj">+ Dodaj produkt</button>
-    <button class="btn" onclick="wyslij()">✓ WYŚLIJ DANE</button>
-    <div style="height:24px"></div>
+<!-- TANKOWANIE -->
+<div class="card" style="border-left:4px solid #f59e0b;">
+  <div class="card-title">⛽ Tankowanie pojazdu</div>
+  <div class="row2">
+    <div><label style="margin-top:0">Zatankowano (litry)</label><input type="number" id="tank-litry" placeholder="0.00" inputmode="decimal" oninput="obliczSpalanie()"></div>
+    <div><label style="margin-top:0">Km przy tankowaniu</label><input type="number" id="tank-km" placeholder="np. 450" inputmode="numeric" oninput="obliczSpalanie()"></div>
   </div>
-
-  <div id="ok-screen" style="display:none;" class="ok">
-    <div class="ok-ico">✅</div>
-    <h2 style="color:#0f1f3d;margin-bottom:8px;">Wysłano!</h2>
-    <p style="color:#666;margin-bottom:24px;" id="ok-msg">Dane wysłane do Google Sheets!</p>
-    <button class="btn" style="width:auto;padding:12px 32px;" onclick="resetForm()">+ Nowy wpis</button>
+  <div id="spalanie-wynik" style="display:none;" class="stat-box">
+    <div class="stat-lab">Spalanie</div>
+    <div class="stat-val" id="spal-val">–</div>
   </div>
 </div>
 
-<div id="tab-admin" class="page" style="display:none;">
-  <div class="hero"><h2>PANEL BIURA</h2><p>Dane kierowców w Google Sheets</p></div>
-  <div class="sheets-box">
-    <p>Wszystkie wpisy kierowców są tutaj:</p>
-    <a href="https://docs.google.com/spreadsheets/d/1PSgKxHIP-hN9-urvQ9CIBcGyMB_kMA-kFvWlg3TVX-8/edit" target="_blank" style="display:inline-block;background:#0f9d58;color:#fff;border-radius:8px;padding:12px 24px;font-weight:bold;font-size:16px;text-decoration:none;">📊 Otwórz Google Sheets</a>
+<!-- ZDJĘCIA -->
+<div class="card" style="border-left:4px solid #8b5cf6;">
+  <div class="card-title">📷 Zdjęcia dokumentów</div>
+  <label style="margin-top:0">Dokument WZ (załadunek)</label>
+  <div class="foto-box" id="foto-wz-box">
+    <label class="foto-label" for="foto-wz-input">+</label>
+    <input type="file" id="foto-wz-input" accept="image/*" capture="environment" onchange="dodajFoto('wz',this)">
+  </div>
+  <label>Paragon / wydruk z cysterny</label>
+  <div class="foto-box" id="foto-par-box">
+    <label class="foto-label" for="foto-par-input">+</label>
+    <input type="file" id="foto-par-input" accept="image/*" capture="environment" onchange="dodajFoto('par',this)">
+  </div>
+</div>
+
+<div id="produkty"></div>
+<button class="btn-add" onclick="dodajProdukt()" id="btn-dodaj">+ Dodaj produkt</button>
+<button class="btn" onclick="wyslij()">✓ WYŚLIJ DANE</button>
+<div style="height:24px"></div>
+```
+
+  </div>
+
+  <div id="ok-screen" style="display:none;" class="ok">
+    <div class="ok-ico" id="ok-ico">✅</div>
+    <h2 style="color:#059669;font-family:'Barlow Condensed',sans-serif;font-size:32px;letter-spacing:2px;" id="ok-title">WYSŁANO!</h2>
+    <p style="color:#64748b;margin-bottom:8px;margin-top:8px;" id="ok-msg">Dane zapisane!</p>
+    <div id="ok-offline-info" style="display:none;background:#fef3c7;border-radius:8px;padding:10px;margin-bottom:16px;font-size:13px;color:#92400e;">
+      📴 Brak internetu – dane zapisane na telefonie. Wyślemy automatycznie gdy wróci zasięg.
+    </div>
+    <button class="btn btn-green" style="width:auto;padding:12px 32px;" onclick="resetForm()">+ Nowy wpis</button>
+    <button class="btn" style="width:auto;padding:12px 32px;margin-left:8px;" onclick="goTab('hist')">📜 Historia</button>
+  </div>
+</div>
+
+<!-- ===== HISTORIA ===== -->
+
+<div class="page" id="tab-hist">
+  <div class="hero"><h2>📜 HISTORIA TRAS</h2><p>Wybierz kierowcę aby zobaczyć jego trasy</p></div>
+
+  <!-- Wybór kierowcy -->
+
+  <div class="card" style="border-left:4px solid #2563eb;">
+    <div class="card-title">👤 Kto przeglądasz?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+      <button class="kierowca-btn" id="kb-Wojtek" onclick="wybierzKierowce('Wojtek')">👷 Wojtek</button>
+      <button class="kierowca-btn" id="kb-Jakub" onclick="wybierzKierowce('Jakub')">👷 Jakub</button>
+      <button class="kierowca-btn" id="kb-Szczepan" onclick="wybierzKierowce('Szczepan')">👷 Szczepan</button>
+      <button class="kierowca-btn" id="kb-wszyscy" onclick="wybierzKierowce('wszyscy')" style="display:none;">👥 Wszyscy</button>
+    </div>
+  </div>
+
+  <!-- Statystyki kierowcy -->
+
+  <div id="hist-stats" style="display:none;" class="card" style="margin-top:12px;">
+    <div class="card-title" id="hist-stats-title">Statystyki</div>
+    <div class="row3">
+      <div style="text-align:center;">
+        <div class="stat-lab">Trasy</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#1e3a8a;" id="stat-trasy">0</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="stat-lab">Łącznie km</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#1e3a8a;" id="stat-km">0</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="stat-lab">Śr. spalanie</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#f59e0b;" id="stat-spal">–</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:4px;">
+    <button class="btn-sm" onclick="renderHistoria()">🔄 Odśwież</button>
+    <button class="btn-sm" style="background:#fee2e2;color:#b91c1c;" onclick="wyczyscHistorie()">🗑️ Wyczyść moje</button>
+  </div>
+  <div id="historia-list"><p style="color:#94a3b8;text-align:center;padding:30px;">Wybierz kierowcę powyżej</p></div>
+</div>
+
+<!-- ===== POCZTA ===== -->
+
+<div class="page" id="tab-mail">
+  <div class="hero"><h2>📧 SKRZYNKA GMAIL</h2><p>Otwórz skrzynkę odbiorczą pojazdu</p></div>
+  <div id="mail-list"></div>
+</div>
+
+<!-- ===== BIURO ===== -->
+
+<div class="page" id="tab-admin">
+  <div class="hero"><h2>🏢 PANEL BIURA</h2><p>Dane, koszty, rozliczenia</p></div>
+
+  <!-- Google Sheets -->
+
+  <div class="card" style="border-left:4px solid #10b981;text-align:center;">
+    <div class="card-title" style="color:#059669;">📊 Google Sheets</div>
+    <a href="https://docs.google.com/spreadsheets/d/1PSgKxHIP-hN9-urvQ9CIBcGyMB_kMA-kFvWlg3TVX-8/edit" target="_blank"
+      style="display:inline-block;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-radius:8px;padding:12px 24px;font-weight:800;font-size:15px;text-decoration:none;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">
+      📊 OTWÓRZ ARKUSZ
+    </a>
+  </div>
+
+  <!-- Kalkulator rozliczenia -->
+
+  <div class="card" style="border-left:4px solid #8b5cf6;">
+    <div class="card-title">🧮 Kalkulator rozliczenia kierowcy</div>
+    <label style="margin-top:0">Kierowca</label>
+    <select id="kalk-kierowca">
+      <option value="">– wybierz –</option>
+      <option>Wojtek</option><option>Jakub</option><option>Szczepan</option>
+    </select>
+    <div class="row2">
+      <div><label style="margin-top:0">Km w miesiącu</label><input type="number" id="kalk-km" placeholder="0" oninput="obliczRozliczenie()"></div>
+      <div><label style="margin-top:0">Stawka km (zł)</label><input type="number" id="kalk-stawka" placeholder="0.00" value="0.50" oninput="obliczRozliczenie()"></div>
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0">Dni w trasie</label><input type="number" id="kalk-dni" placeholder="0" oninput="obliczRozliczenie()"></div>
+      <div><label style="margin-top:0">Dieta dzienna (zł)</label><input type="number" id="kalk-dieta" placeholder="45" value="45" oninput="obliczRozliczenie()"></div>
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0">Premia (zł)</label><input type="number" id="kalk-premia" placeholder="0" oninput="obliczRozliczenie()"></div>
+      <div><label style="margin-top:0">Potrącenia (zł)</label><input type="number" id="kalk-potracenia" placeholder="0" oninput="obliczRozliczenie()"></div>
+    </div>
+    <div class="kalk-result" id="kalk-result" style="display:none;">
+      <div class="stat-lab">Łącznie do wypłaty</div>
+      <div class="big" id="kalk-suma">0,00 zł</div>
+      <div style="margin-top:10px;font-size:13px;color:#374151;" id="kalk-szczeg"></div>
+    </div>
+  </div>
+
+  <!-- Zakup paliwa -->
+
+  <div class="card" style="border-left:4px solid #f59e0b;">
+    <div class="card-title">🛢️ Zakup paliwa</div>
+    <label style="margin-top:0">Data zakupu</label>
+    <input type="date" id="zp-data">
+    <label>Rodzaj paliwa</label>
+    <select id="zp-rodzaj">
+      <option value="">– wybierz –</option>
+      <option>ON – Olej napędowy</option>
+      <option>PB95 – Benzyna</option>
+      <option>Olej opałowy</option>
+    </select>
+    <div class="row2">
+      <div><label style="margin-top:0">Cena brutto (zł/l)</label><input type="number" id="zp-brutto" placeholder="0.00" oninput="obliczZakup()"></div>
+      <div><label style="margin-top:0">Cena netto (zł/l)</label><input type="number" id="zp-netto" placeholder="0.00" oninput="obliczZakup()"></div>
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0">Ilość RZ (litry)</label><input type="number" id="zp-rz" placeholder="0" oninput="obliczZakup()"></div>
+      <div><label style="margin-top:0">Ilość 15°C (litry)</label><input type="number" id="zp-15" placeholder="0" oninput="obliczZakup()"></div>
+    </div>
+    <div id="zp-wynik" style="display:none;" class="stat-box">
+      <div class="row3">
+        <div><div class="stat-lab">Wartość brutto</div><div style="font-weight:800;font-size:16px;" id="zp-wbr">–</div></div>
+        <div><div class="stat-lab">Wartość netto</div><div style="font-weight:800;font-size:16px;" id="zp-wne">–</div></div>
+        <div><div class="stat-lab">VAT</div><div style="font-weight:800;font-size:16px;color:#ef4444;" id="zp-vat">–</div></div>
+      </div>
+    </div>
+    <label>Dostawca / Uwagi</label>
+    <textarea id="zp-uwagi" placeholder="np. PKN Orlen, faktura nr..."></textarea>
+    <button class="btn btn-green" onclick="zapiszZakup()">💾 ZAPISZ ZAKUP</button>
+  </div>
+
+  <!-- Koszty stałe -->
+
+  <div class="card" style="border-left:4px solid #3b82f6;">
+    <div class="card-title">📌 Koszty stałe</div>
+    <div id="koszty-stale-list"></div>
+    <button class="btn-add" onclick="dodajKoszt('stale')">+ Dodaj koszt stały</button>
+    <div class="koszt-sum"><span style="color:#475569;font-size:14px;">SUMA STAŁE:</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#1e3a8a;" id="suma-stale">0,00 zł</span></div>
+  </div>
+
+  <!-- Koszty zmienne -->
+
+  <div class="card" style="border-left:4px solid #f97316;">
+    <div class="card-title">🔄 Koszty zmienne</div>
+    <div id="koszty-zmienne-list"></div>
+    <button class="btn-add" onclick="dodajKoszt('zmienne')">+ Dodaj koszt zmienny</button>
+    <div class="koszt-sum"><span style="color:#475569;font-size:14px;">SUMA ZMIENNE:</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#ea580c;" id="suma-zmienne">0,00 zł</span></div>
+  </div>
+
+  <!-- Suma łączna -->
+
+  <div class="card" style="border-left:4px solid #1e3a8a;text-align:center;margin-bottom:20px;">
+    <div class="stat-lab" style="margin-bottom:4px;">ŁĄCZNE KOSZTY TRANSPORTU</div>
+    <div class="stat-val" style="font-size:40px;" id="suma-total">0,00 zł</div>
   </div>
 </div>
 
 <script>
-// Programy i ich współczynniki (litry ubytku na 100L)
+// ===== HASŁO =====
+var HASLO = 'cysterna2026';
+var adminOdblokowany = false;
+var aktywnyKierowca = null;
+var PINY = { 'Wojtek': '2525', 'Jakub': '2325', 'Szczepan': '2425' };
+
+// ===== STORAGE SAFE (działa też gdy localStorage zablokowany na iOS) =====
+var _memStore = {};
+var _storageOK = (function(){
+  try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return true; }
+  catch(e){ return false; }
+})();
+
+function lsGet(key) {
+  try {
+    if(_storageOK) return localStorage.getItem(key);
+    return _memStore[key] || null;
+  } catch(e){ return _memStore[key] || null; }
+}
+function lsSet(key, val) {
+  try {
+    if(_storageOK) localStorage.setItem(key, val);
+    else _memStore[key] = val;
+  } catch(e){ _memStore[key] = val; }
+}
+function lsRemove(key) {
+  try {
+    if(_storageOK) localStorage.removeItem(key);
+    else delete _memStore[key];
+  } catch(e){ delete _memStore[key]; }
+}
+
+// ===== OFFLINE =====
+var isOnline = navigator.onLine;
+function updateOnlineStatus() {
+  try {
+    isOnline = navigator.onLine;
+    var bar = document.getElementById('offline-bar');
+    if(bar) bar.classList.toggle('show', !isOnline);
+    if(isOnline) wyslijOczekujace();
+  } catch(e){}
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ===== STORAGE =====
+function getHistoria() {
+  try { return JSON.parse(lsGet('cysterna_historia') || '[]'); } catch(e){ return []; }
+}
+function saveHistoria(arr) {
+  try { lsSet('cysterna_historia', JSON.stringify(arr)); } catch(e){}
+}
+function getOczekujace() {
+  try { return JSON.parse(lsGet('cysterna_oczekujace') || '[]'); } catch(e){ return []; }
+}
+function saveOczekujace(arr) {
+  try { lsSet('cysterna_oczekujace', JSON.stringify(arr)); } catch(e){}
+}
+
+function wyslijOczekujace() {
+  var oczekujace = getOczekujace();
+  if(oczekujace.length === 0) return;
+  oczekujace.forEach(function(payload) {
+    fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+    }).then(function(){
+      // oznacz jako wysłane w historii
+      var hist = getHistoria();
+      hist.forEach(function(h){ if(h.ts === payload.ts) h.wyslane = true; });
+      saveHistoria(hist);
+    }).catch(function(){});
+  });
+  saveOczekujace([]);
+}
+
+// ===== TABS =====
+function goTab(t) {
+  if(t === 'admin' && !adminOdblokowany) {
+    document.getElementById('lock-screen').style.display = 'flex';
+    return;
+  }
+  ['form','hist','mail','admin'].forEach(function(n){
+    document.getElementById('tab-'+n).classList.remove('active');
+    document.getElementById('tb-'+n).classList.remove('active');
+  });
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('tb-'+t).classList.add('active');
+  if(t==='hist') {
+    var wsBtn = document.getElementById('kb-wszyscy');
+    if(wsBtn) wsBtn.style.display = adminOdblokowany ? 'block' : 'none';
+  }
+}
+
+function sprawdzHaslo() {
+  if(document.getElementById('haslo-input').value === HASLO) {
+    adminOdblokowany = true;
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('haslo-input').value = '';
+    goTab('admin');
+  } else {
+    document.getElementById('lock-err').textContent = '❌ Błędne hasło!';
+    document.getElementById('haslo-input').value = '';
+  }
+}
+function anulujBiuro() {
+  document.getElementById('lock-screen').style.display = 'none';
+  goTab('form');
+}
+
+// ===== HISTORIA =====
+var _pinTarget = null;
+var _pinBuf = '';
+
+function wybierzKierowce(kto) {
+  if(kto === 'wszyscy') {
+    // biuro - już zalogowane hasłem
+    aktywnyKierowca = 'wszyscy';
+    podswietlKierowce('wszyscy');
+    renderHistoria();
+    return;
+  }
+  // Pokaż PIN ekran
+  _pinTarget = kto;
+  _pinBuf = '';
+  updatePinDots();
+  document.getElementById('pin-title').textContent = '👷 ' + kto.toUpperCase();
+  document.getElementById('pin-subtitle').textContent = 'Wpisz swój PIN aby zobaczyć trasy';
+  document.getElementById('pin-err').textContent = '';
+  document.getElementById('pin-overlay').style.display = 'flex';
+}
+
+function pinKey(d) {
+  if(_pinBuf.length >= 4) return;
+  _pinBuf += d;
+  updatePinDots();
+  if(_pinBuf.length === 4) sprawdzPin();
+}
+
+function pinDel() {
+  _pinBuf = _pinBuf.slice(0, -1);
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+}
+
+function pinAnuluj() {
+  _pinBuf = '';
+  _pinTarget = null;
+  document.getElementById('pin-overlay').style.display = 'none';
+}
+
+function updatePinDots() {
+  for(var i=0;i<4;i++){
+    var dot = document.getElementById('pd-'+i);
+    if(dot) dot.classList.toggle('filled', i < _pinBuf.length);
+  }
+}
+
+function sprawdzPin() {
+  var poprawny = PINY[_pinTarget];
+  if(_pinBuf === poprawny) {
+    document.getElementById('pin-overlay').style.display = 'none';
+    aktywnyKierowca = _pinTarget;
+    podswietlKierowce(_pinTarget);
+    renderHistoria();
+  } else {
+    document.getElementById('pin-err').textContent = '❌ Błędny PIN! Spróbuj ponownie.';
+    _pinBuf = '';
+    updatePinDots();
+  }
+}
+
+function podswietlKierowce(kto) {
+  ['Wojtek','Jakub','Szczepan','wszyscy'].forEach(function(k){
+    var btn = document.getElementById('kb-'+k);
+    if(btn) btn.classList.toggle('active', k===kto);
+  });
+}
+
+function renderHistoria() {
+  var cont = document.getElementById('historia-list');
+  if(!aktywnyKierowca) {
+    cont.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:30px 0;">👆 Wybierz kierowcę powyżej</p>';
+    document.getElementById('hist-stats').style.display = 'none';
+    return;
+  }
+  var hist = getHistoria();
+  // Filtruj po kierowcy (biuro widzi wszystkich)
+  var filtered = (aktywnyKierowca === 'wszyscy')
+    ? hist
+    : hist.filter(function(h){ return h.kierowca === aktywnyKierowca; });
+
+  // Statystyki
+  var statsBox = document.getElementById('hist-stats');
+  if(filtered.length > 0) {
+    statsBox.style.display = 'block';
+    document.getElementById('hist-stats-title').textContent =
+      (aktywnyKierowca==='wszyscy' ? 'Wszyscy kierowcy' : '👷 '+aktywnyKierowca) + ' – podsumowanie';
+    var totalKm = filtered.reduce(function(a,h){ return a+(h.km||0); }, 0);
+    var spalania = filtered.filter(function(h){ return h.tankowanie && h.tankowanie.spalanieL100km; })
+                           .map(function(h){ return h.tankowanie.spalanieL100km; });
+    var srSpal = spalania.length ? (spalania.reduce(function(a,b){return a+b;},0)/spalania.length).toFixed(1) : null;
+    document.getElementById('stat-trasy').textContent = filtered.length;
+    document.getElementById('stat-km').textContent = totalKm;
+    document.getElementById('stat-spal').textContent = srSpal ? srSpal+' l' : '–';
+  } else {
+    statsBox.style.display = 'none';
+  }
+
+  if(filtered.length === 0) {
+    cont.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:30px 0;">Brak wpisów dla '+aktywnyKierowca+'</p>';
+    return;
+  }
+  cont.innerHTML = '';
+  var sorted = filtered.slice().reverse();
+  sorted.forEach(function(h, i) {
+    var allHist = getHistoria();
+    var realIdx = allHist.findIndex(function(x){ return x.ts === h.ts; });
+    var div = document.createElement('div');
+    div.className = 'hist-item';
+    var statusBadge = h.wyslane
+      ? '<span class="hist-badge hist-sent">✓ Wysłano</span>'
+      : '<span class="hist-badge hist-offline">⏳ Oczekuje</span>';
+    var produktyStr = (h.produkty||[]).map(function(p){
+      return '<div style="font-size:12px;color:#475569;margin-top:4px;">'+p.paliwo+': zał.'+p.zaladunek_RZ+'L | roz.'+p.rozlane_RZ+'L | <b>'+p.status+'</b></div>';
+    }).join('');
+    var editBtn = adminOdblokowany
+      ? '<button class="btn-sm" style="background:#eff6ff;color:#1d4ed8;margin-top:10px;width:100%;" onclick="otworzEdycje('+realIdx+')">✏️ Edytuj wpis</button>'
+      : '<button class="btn-sm" style="margin-top:10px;width:100%;" onclick="prosbaOEdycje('+realIdx+')">✏️ Zgłoś do poprawy</button>';
+    div.innerHTML =
+      '<h4>' + (h.kierowca||'–') + ' – ' + (h.pojazd||'–') + ' ' + statusBadge + '</h4>' +
+      '<div class="hist-meta">📅 ' + (h.data||'–') + ' &nbsp;|&nbsp; 🛣️ ' + (h.km||0) + ' km &nbsp;|&nbsp; 📄 ' + (h.wz||'–') + '</div>' +
+      (h.tankowanie && h.tankowanie.spalanieL100km ? '<div style="font-size:12px;color:#1d4ed8;margin-bottom:4px;">⛽ Spalanie: <b>'+h.tankowanie.spalanieL100km+' l/100km</b></div>' : '') +
+      produktyStr + editBtn;
+    cont.appendChild(div);
+  });
+}
+
+function wyczyscHistorie() {
+  if(confirm('Wyczyścić całą historię tras?')) {
+    lsRemove('cysterna_historia');
+    renderHistoria();
+  }
+}
+
+// ===== EDYCJA =====
+function otworzEdycje(idx) {
+  var hist = getHistoria();
+  var h = hist[idx];
+  if(!h) return;
+  document.getElementById('edit-ts').value = h.ts || '';
+  document.getElementById('edit-info').textContent = 'Wpis: ' + (h.kierowca||'') + ' – ' + (h.data||'') + ' (nr '+idx+')';
+  document.getElementById('edit-kierowca').value = h.kierowca || '';
+  document.getElementById('edit-pojazd').value = h.pojazd || '';
+  document.getElementById('edit-data').value = h.data || '';
+  document.getElementById('edit-zam').value = h.zam || '';
+  document.getElementById('edit-wz').value = h.wz || '';
+  document.getElementById('edit-kms').value = h.kmStart || '';
+  document.getElementById('edit-kmk').value = h.kmKoniec || '';
+  document.getElementById('edit-tank-litry').value = (h.tankowanie && h.tankowanie.litry) || '';
+  document.getElementById('edit-tank-km').value = (h.tankowanie && h.tankowanie.kmPrzyTankowaniu) || '';
+
+  // Produkty
+  var pb = document.getElementById('edit-produkty-box');
+  pb.innerHTML = '';
+  (h.produkty||[]).forEach(function(p, pi) {
+    var sec = document.createElement('div');
+    sec.className = 'card';
+    sec.style.borderLeft = '4px solid #2563eb';
+    sec.style.marginTop = '12px';
+    sec.innerHTML =
+      '<div class="card-title">PRODUKT '+(pi+1)+'</div>'+
+      '<div class="row2">'+
+        '<div><label style="margin-top:0">Paliwo</label>'+
+        '<select id="ep-pal-'+pi+'">'+
+          '<option value="ON"'+(p.paliwo==='ON'?' selected':'')+'>ON</option>'+
+          '<option value="PB"'+(p.paliwo==='PB'?' selected':'')+'>PB95</option>'+
+          '<option value="OP"'+(p.paliwo==='OP'?' selected':'')+'>Olej opałowy</option>'+
+        '</select></div>'+
+        '<div><label style="margin-top:0">Program</label>'+
+        '<input type="number" id="ep-prog-'+pi+'" value="'+(p.program||'')+'"></div>'+
+      '</div>'+
+      '<div class="row2" style="margin-top:8px;">'+
+        '<div><label style="margin-top:0">Zał. RZ</label><input type="number" id="ep-zrz-'+pi+'" value="'+(p.zaladunek_RZ||0)+'"></div>'+
+        '<div><label style="margin-top:0">Zał. 15°C</label><input type="number" id="ep-z15-'+pi+'" value="'+(p.zaladunek_15||0)+'"></div>'+
+      '</div>'+
+      '<div class="row2" style="margin-top:8px;">'+
+        '<div><label style="margin-top:0">Roz. RZ</label><input type="number" id="ep-rrz-'+pi+'" value="'+(p.rozlane_RZ||0)+'"></div>'+
+        '<div><label style="margin-top:0">Roz. 15°C</label><input type="number" id="ep-r15-'+pi+'" value="'+(p.rozlane_15||0)+'"></div>'+
+      '</div>';
+    pb.appendChild(sec);
+  });
+
+  document.getElementById('edit-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function zamknijEdycje() {
+  document.getElementById('edit-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function prosbaOEdycje(idx) {
+  alert('Zgłoszono prośbę o poprawę wpisu nr '+idx+'. Skontaktuj się z biurem.');
+}
+
+function zapiszEdycje() {
+  var hist = getHistoria();
+  var ts = document.getElementById('edit-ts').value;
+  var idx = hist.findIndex(function(h){ return h.ts === ts; });
+  if(idx === -1) { alert('Nie znaleziono wpisu!'); return; }
+
+  var kms = parseFloat(document.getElementById('edit-kms').value)||0;
+  var kmk = parseFloat(document.getElementById('edit-kmk').value)||0;
+  var tankL = parseFloat(document.getElementById('edit-tank-litry').value)||0;
+  var tankKm = parseFloat(document.getElementById('edit-tank-km').value)||0;
+
+  // Przelicz produkty
+  var produkty = hist[idx].produkty || [];
+  produkty = produkty.map(function(p, pi) {
+    var pal = document.getElementById('ep-pal-'+pi) ? document.getElementById('ep-pal-'+pi).value : p.paliwo;
+    var prog = parseInt(document.getElementById('ep-prog-'+pi) ? document.getElementById('ep-prog-'+pi).value : p.program);
+    var zRZ = parseFloat(document.getElementById('ep-zrz-'+pi) ? document.getElementById('ep-zrz-'+pi).value : p.zaladunek_RZ)||0;
+    var z15 = parseFloat(document.getElementById('ep-z15-'+pi) ? document.getElementById('ep-z15-'+pi).value : p.zaladunek_15)||0;
+    var rRZ = parseFloat(document.getElementById('ep-rrz-'+pi) ? document.getElementById('ep-rrz-'+pi).value : p.rozlane_RZ)||0;
+    var r15 = parseFloat(document.getElementById('ep-r15-'+pi) ? document.getElementById('ep-r15-'+pi).value : p.rozlane_15)||0;
+    var progData = getProgData(pal, prog);
+    var wsp = progData ? progData.wsp/100 : 0;
+    var typ = progData ? progData.typ : p.typProg;
+    var zalU = typ==='15'?z15:zRZ;
+    var rozU = typ==='15'?r15:rRZ;
+    var norma = +(zalU*wsp).toFixed(2);
+    var rozn = +(zalU-rozU).toFixed(2);
+    var rozNetto = +(rozn-norma).toFixed(2);
+    var status = rozNetto<0?'OSZCZĘDNOŚĆ':rozNetto<=10?'OK – W NORMIE':rozNetto<=50?'PONAD NORMĘ':'DUŻY UBYTEK';
+    return {nrProduktu:pi+1,paliwo:pal,program:prog,typProg:typ,zaladunek_RZ:zRZ,zaladunek_15:z15,rozlane_RZ:rRZ,rozlane_15:r15,normaUbytek:norma,roznica:rozn,roznicaNetto:rozNetto,status:status};
+  });
+
+  var spalanie = tankL>0&&tankKm>0 ? +(tankL/tankKm*100).toFixed(2) : null;
+  var updated = Object.assign({}, hist[idx], {
+    kierowca: document.getElementById('edit-kierowca').value,
+    pojazd: document.getElementById('edit-pojazd').value,
+    data: document.getElementById('edit-data').value,
+    zam: document.getElementById('edit-zam').value,
+    wz: document.getElementById('edit-wz').value,
+    kmStart: kms, kmKoniec: kmk, km: kmk-kms,
+    tankowanie: {litry:tankL, kmPrzyTankowaniu:tankKm, spalanieL100km:spalanie},
+    produkty: produkty,
+    edytowano: new Date().toLocaleString('pl-PL'),
+    wyslane: false
+  });
+
+  hist[idx] = updated;
+  saveHistoria(hist);
+
+  // Wyślij ponownie
+  if(isOnline) {
+    fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(Object.assign({},updated,{akcja:'EDYCJA'}))
+    }).then(function(){
+      hist[idx].wyslane = true;
+      saveHistoria(hist);
+    }).catch(function(){});
+  } else {
+    var ocz = getOczekujace();
+    ocz.push(Object.assign({},updated,{akcja:'EDYCJA'}));
+    saveOczekujace(ocz);
+  }
+
+  zamknijEdycje();
+  renderHistoria();
+  alert('✅ Wpis zaktualizowany!');
+}
+
+// ===== ZDJĘCIA =====
+var fotoData = {wz:[], par:[]};
+function dodajFoto(typ, input) {
+  var file = input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    fotoData[typ].push(e.target.result);
+    renderFotoBox(typ);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function renderFotoBox(typ) {
+  var box = document.getElementById('foto-'+typ+'-box');
+  var inputId = 'foto-'+typ+'-input';
+  box.innerHTML = '';
+  fotoData[typ].forEach(function(src, i) {
+    var img = document.createElement('img');
+    img.className = 'foto-thumb';
+    img.src = src;
+    img.onclick = function(){ if(confirm('Usuń to zdjęcie?')){ fotoData[typ].splice(i,1); renderFotoBox(typ); } };
+    box.appendChild(img);
+  });
+  var lbl = document.createElement('label');
+  lbl.className = 'foto-label';
+  lbl.setAttribute('for', inputId);
+  lbl.textContent = '+';
+  box.appendChild(lbl);
+}
+
+// ===== PRODUKTY =====
 var PROGRAMY = {
-  ON:  [{nr:11,typ:'RZ',wsp:2},{nr:12,typ:'RZ',wsp:3},{nr:13,typ:'RZ',wsp:4},{nr:14,typ:'15',wsp:2},{nr:15,typ:'15',wsp:3},{nr:16,typ:'15',wsp:4}],
-  PB:  [{nr:17,typ:'RZ',wsp:2},{nr:18,typ:'15',wsp:2}],
-  OP:  [{nr:21,typ:'RZ',wsp:2},{nr:22,typ:'15',wsp:2}]
+  ON:[{nr:11,typ:'RZ',wsp:2},{nr:12,typ:'RZ',wsp:3},{nr:13,typ:'RZ',wsp:4},{nr:14,typ:'15',wsp:2},{nr:15,typ:'15',wsp:3},{nr:16,typ:'15',wsp:4}],
+  PB:[{nr:17,typ:'RZ',wsp:2},{nr:18,typ:'15',wsp:2}],
+  OP:[{nr:21,typ:'RZ',wsp:2},{nr:22,typ:'15',wsp:2}]
 };
+var produktCount=0, selectedProgs={};
 
-var produktCount = 0;
-var selectedProgs = {};
+document.addEventListener('DOMContentLoaded', function() {
+  try { document.getElementById('data').valueAsDate = new Date(); } catch(e){}
+  try { document.getElementById('zp-data').valueAsDate = new Date(); } catch(e){}
+  try { dodajProdukt(); } catch(e){ console.log('dodajProdukt err:',e); }
+  try { renderMail(); } catch(e){ console.log('renderMail err:',e); }
+});
 
-document.getElementById('data').valueAsDate = new Date();
-dodajProdukt();
-
-function getPaliwoKey(val) {
-  if(val.indexOf('ON')>-1) return 'ON';
-  if(val.indexOf('PB')>-1) return 'PB';
-  if(val.indexOf('Olej opałowy')>-1) return 'OP';
-  return null;
+function obliczSpalanie() {
+  var litry = parseFloat(document.getElementById('tank-litry').value);
+  var tankKm = parseFloat(document.getElementById('tank-km').value);
+  var wynik = document.getElementById('spalanie-wynik');
+  if(tankKm>0 && litry>0) {
+    wynik.style.display='block';
+    document.getElementById('spal-val').textContent = (litry/tankKm*100).toFixed(1)+' l/100km';
+  } else {
+    wynik.style.display='none';
+  }
 }
 
 function dodajProdukt() {
-  if(produktCount >= 3) { alert('Maksymalnie 3 produkty!'); return; }
+  if(produktCount>=3){alert('Maksymalnie 3 produkty!');return;}
   produktCount++;
-  var id = produktCount;
-  selectedProgs[id] = null;
-
-  var div = document.createElement('div');
-  div.className = 'produkt-box';
-  div.id = 'produkt-' + id;
-  div.innerHTML =
-    '<h3>PRODUKT ' + id + (id>1?'<button class="btn-remove" onclick="usunProdukt('+id+')">✕ Usuń</button>':'') + '</h3>' +
-    '<label>Rodzaj paliwa *</label>' +
-    '<select id="pal-'+id+'" onchange="renderProgramy('+id+')">' +
-      '<option value="">– wybierz –</option>' +
-      '<option value="ON">ON – Olej napędowy</option>' +
-      '<option value="PB">PB95 – Benzyna</option>' +
-      '<option value="OP">Olej opałowy</option>' +
-    '</select>' +
-    '<label>Program rozlewania *</label>' +
-    '<div class="prog-grid" id="progi-'+id+'"><p style="color:#999;font-size:13px;">Najpierw wybierz paliwo</p></div>' +
-    '<div style="background:#f0f4f8;border-radius:8px;padding:10px;margin-top:14px;">' +
-      '<p style="font-size:12px;font-weight:bold;color:#0f1f3d;text-transform:uppercase;margin-bottom:8px;">📋 Załadunek (z WZ)</p>' +
-      '<div class="row2">' +
-        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="zal-rz-'+id+'" placeholder="0" inputmode="numeric"></div>' +
-        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="zal-15-'+id+'" placeholder="0" inputmode="numeric"></div>' +
-      '</div>' +
-    '</div>' +
-    '<div style="background:#fff3e0;border-radius:8px;padding:10px;margin-top:10px;">' +
-      '<p style="font-size:12px;font-weight:bold;color:#0f1f3d;text-transform:uppercase;margin-bottom:8px;">🔧 Rozlane u klientów (z licznika)</p>' +
-      '<div class="row2">' +
-        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="roz-rz-'+id+'" placeholder="0" inputmode="numeric"></div>' +
-        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="roz-15-'+id+'" placeholder="0" inputmode="numeric"></div>' +
-      '</div>' +
+  var id=produktCount;
+  selectedProgs[id]=null;
+  var div=document.createElement('div');
+  div.className='card';
+  div.id='produkt-'+id;
+  div.style.borderLeft='4px solid #2563eb';
+  div.innerHTML=
+    '<div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">PRODUKT '+id+
+    (id>1?'<button class="btn-remove" onclick="usunProdukt('+id+')">✕ Usuń</button>':'')+'</div>'+
+    '<label style="margin-top:0">Rodzaj paliwa *</label>'+
+    '<select id="pal-'+id+'" onchange="renderProgramy('+id+')">'+
+      '<option value="">– wybierz –</option>'+
+      '<option value="ON">ON – Olej napędowy</option>'+
+      '<option value="PB">PB95 – Benzyna</option>'+
+      '<option value="OP">Olej opałowy</option>'+
+    '</select>'+
+    '<label>Program rozlewania *</label>'+
+    '<div class="prog-grid" id="progi-'+id+'"><p style="color:#94a3b8;font-size:13px;grid-column:1/-1;">Najpierw wybierz paliwo</p></div>'+
+    '<div class="section-bg">'+
+      '<div class="section-label" style="color:#2563eb;">📋 Załadunek (z WZ)</div>'+
+      '<div class="row2">'+
+        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="zal-rz-'+id+'" placeholder="0" inputmode="numeric"></div>'+
+        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="zal-15-'+id+'" placeholder="0" inputmode="numeric"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="section-bg" style="border-color:#fed7aa;">'+
+      '<div class="section-label" style="color:#ea580c;">🔧 Rozlane u klientów</div>'+
+      '<div class="row2">'+
+        '<div><label style="margin-top:0">Litry RZ *</label><input type="number" id="roz-rz-'+id+'" placeholder="0" inputmode="numeric"></div>'+
+        '<div><label style="margin-top:0">Litry 15°C *</label><input type="number" id="roz-15-'+id+'" placeholder="0" inputmode="numeric"></div>'+
+      '</div>'+
     '</div>';
-
   document.getElementById('produkty').appendChild(div);
-  if(produktCount >= 3) document.getElementById('btn-dodaj').style.display='none';
+  if(produktCount>=3) document.getElementById('btn-dodaj').style.display='none';
 }
 
 function usunProdukt(id) {
-  var el = document.getElementById('produkt-'+id);
+  var el=document.getElementById('produkt-'+id);
   if(el) el.remove();
   delete selectedProgs[id];
-  if(produktCount >= 3) document.getElementById('btn-dodaj').style.display='block';
+  if(produktCount>=3) document.getElementById('btn-dodaj').style.display='block';
   produktCount--;
 }
 
 function renderProgramy(id) {
-  var pal = document.getElementById('pal-'+id).value;
-  var cont = document.getElementById('progi-'+id);
-  selectedProgs[id] = null;
-  if(!pal) { cont.innerHTML='<p style="color:#999;font-size:13px;">Najpierw wybierz paliwo</p>'; return; }
-  var progi = PROGRAMY[pal];
-  cont.innerHTML = '';
-  progi.forEach(function(p) {
-    var btn = document.createElement('div');
-    btn.className = 'prog';
-    btn.id = 'prog-'+id+'-'+p.nr;
-    btn.innerHTML = p.nr+'<br><span style="font-size:10px;font-weight:normal;">'+p.typ+'</span>';
-    btn.onclick = function() { selProg(id, p.nr); };
+  var pal=document.getElementById('pal-'+id).value;
+  var cont=document.getElementById('progi-'+id);
+  selectedProgs[id]=null;
+  if(!pal){cont.innerHTML='<p style="color:#94a3b8;font-size:13px;grid-column:1/-1;">Najpierw wybierz paliwo</p>';return;}
+  cont.innerHTML='';
+  PROGRAMY[pal].forEach(function(p){
+    var btn=document.createElement('div');
+    btn.className='prog';
+    btn.id='prog-'+id+'-'+p.nr;
+    btn.innerHTML=p.nr+'<br><span style="font-size:10px;font-weight:400;">'+p.typ+'</span>';
+    btn.onclick=function(){selProg(id,p.nr);};
     cont.appendChild(btn);
   });
 }
 
-function selProg(id, nr) {
-  selectedProgs[id] = nr;
-  var pal = document.getElementById('pal-'+id).value;
-  var progi = PROGRAMY[pal];
-  progi.forEach(function(p) {
-    var el = document.getElementById('prog-'+id+'-'+p.nr);
-    if(el) el.className = 'prog' + (p.nr===nr?' on':'');
+function selProg(id,nr) {
+  selectedProgs[id]=nr;
+  var pal=document.getElementById('pal-'+id).value;
+  PROGRAMY[pal].forEach(function(p){
+    var el=document.getElementById('prog-'+id+'-'+p.nr);
+    if(el) el.className='prog'+(p.nr===nr?' on':'');
   });
 }
 
-function getProgData(palKey, nr) {
-  if(!palKey || !nr) return null;
-  var progi = PROGRAMY[palKey];
-  for(var i=0;i<progi.length;i++) { if(progi[i].nr===nr) return progi[i]; }
+function getProgData(palKey,nr) {
+  if(!palKey||!nr) return null;
+  var progi=PROGRAMY[palKey];
+  for(var i=0;i<progi.length;i++) if(progi[i].nr===nr) return progi[i];
   return null;
 }
 
+// ===== WALIDACJA =====
+function waliduj() {
+  var bledy=[];
+  var kierowca=document.getElementById('kierowca').value;
+  var pojazd=document.getElementById('pojazd').value;
+  var data=document.getElementById('data').value;
+  var zam=document.getElementById('zam').value.trim();
+  var wz=document.getElementById('wz').value.trim();
+  var kms=document.getElementById('kms').value;
+  var kmk=document.getElementById('kmk').value;
+
+  if(!kierowca) bledy.push('Kierowca nie wybrany');
+  if(!pojazd) bledy.push('Pojazd nie wybrany');
+  if(!data) bledy.push('Data trasy');
+  if(!zam) bledy.push('Nr zamówienia');
+  if(!wz) bledy.push('Nr dokumentu WZ');
+  if(!kms) bledy.push('Km start');
+  if(!kmk) bledy.push('Km koniec');
+  if(kms && kmk && parseFloat(kmk)<parseFloat(kms)) bledy.push('Km koniec musi być większy niż start');
+
+  var ids=Object.keys(selectedProgs);
+  var aktywne=ids.filter(function(id){ return document.getElementById('produkt-'+id); });
+  if(aktywne.length===0) bledy.push('Dodaj przynajmniej jeden produkt');
+
+  aktywne.forEach(function(id){
+    var pal=document.getElementById('pal-'+id).value;
+    var prog=selectedProgs[id];
+    var zalRZ=document.getElementById('zal-rz-'+id).value;
+    var zal15=document.getElementById('zal-15-'+id).value;
+    var rozRZ=document.getElementById('roz-rz-'+id).value;
+    var roz15=document.getElementById('roz-15-'+id).value;
+    if(!pal) bledy.push('Produkt '+id+': rodzaj paliwa');
+    if(!prog) bledy.push('Produkt '+id+': program rozlewania');
+    if(!zalRZ) bledy.push('Produkt '+id+': załadunek litry RZ');
+    if(!zal15) bledy.push('Produkt '+id+': załadunek litry 15°C');
+    if(!rozRZ) bledy.push('Produkt '+id+': rozlane litry RZ');
+    if(!roz15) bledy.push('Produkt '+id+': rozlane litry 15°C');
+  });
+
+  var valBox=document.getElementById('val-box');
+  var valList=document.getElementById('val-list');
+  if(bledy.length>0){
+    valList.innerHTML=bledy.map(function(b){return '<li>'+b+'</li>';}).join('');
+    valBox.style.display='block';
+    valBox.scrollIntoView({behavior:'smooth'});
+    return false;
+  }
+  valBox.style.display='none';
+  return true;
+}
+
+// ===== WYŚLIJ =====
 function wyslij() {
+  if(!waliduj()) return;
+
   var kierowca=document.getElementById('kierowca').value;
   var pojazd=document.getElementById('pojazd').value;
   var data=document.getElementById('data').value;
@@ -213,105 +955,283 @@ function wyslij() {
   var wz=document.getElementById('wz').value.trim();
   var kms=parseFloat(document.getElementById('kms').value);
   var kmk=parseFloat(document.getElementById('kmk').value);
+  var km=kmk-kms;
 
-  if(!kierowca||!pojazd||!data||!zam||!wz||isNaN(kms)||isNaN(kmk)){
-    alert('Uzupełnij wszystkie pola ogólne!'); return;
+  var ids=Object.keys(selectedProgs);
+  var produktyData=[];
+  ids.forEach(function(id){
+    var el=document.getElementById('produkt-'+id);
+    if(!el) return;
+    var pal=document.getElementById('pal-'+id).value;
+    var prog=selectedProgs[id];
+    var zalRZ=parseFloat(document.getElementById('zal-rz-'+id).value);
+    var zal15=parseFloat(document.getElementById('zal-15-'+id).value);
+    var rozRZ=parseFloat(document.getElementById('roz-rz-'+id).value);
+    var roz15=parseFloat(document.getElementById('roz-15-'+id).value);
+    var progData=getProgData(pal,prog);
+    var wsp=progData?progData.wsp/100:0;
+    var typ=progData?progData.typ:'';
+    var zalUzyty=typ==='15'?zal15:zalRZ;
+    var rozUzyty=typ==='15'?roz15:rozRZ;
+    var normaUbytek=+(zalUzyty*wsp).toFixed(2);
+    var roznica=+(zalUzyty-rozUzyty).toFixed(2);
+    var roznicaNetto=+(roznica-normaUbytek).toFixed(2);
+    var status=roznicaNetto<0?'OSZCZĘDNOŚĆ':roznicaNetto<=10?'OK – W NORMIE':roznicaNetto<=50?'PONAD NORMĘ':'DUŻY UBYTEK';
+    produktyData.push({nrProduktu:produktyData.length+1,paliwo:pal,program:prog,typProg:typ,zaladunek_RZ:zalRZ,zaladunek_15:zal15,rozlane_RZ:rozRZ,rozlane_15:roz15,normaUbytek:normaUbytek,roznica:roznica,roznicaNetto:roznicaNetto,status:status});
+  });
+
+  var tankLitry=parseFloat(document.getElementById('tank-litry').value)||0;
+  var tankKmVal=parseFloat(document.getElementById('tank-km').value)||0;
+  var spalanie=tankLitry>0&&tankKmVal>0?+(tankLitry/tankKmVal*100).toFixed(2):null;
+  var ts=new Date().toLocaleString('pl-PL');
+
+  var payload={kierowca:kierowca,pojazd:pojazd,data:data,zam:zam,wz:wz,kmStart:kms,kmKoniec:kmk,km:km,
+    tankowanie:{litry:tankLitry,kmPrzyTankowaniu:tankKmVal,spalanieL100km:spalanie},
+    produkty:produktyData,ts:ts};
+
+  // Zapis do historii lokalnie
+  var hist=getHistoria();
+  var wpis=Object.assign({},payload,{wyslane:false});
+  hist.push(wpis);
+  if(hist.length>50) hist=hist.slice(-50);
+  saveHistoria(hist);
+
+  if(isOnline) {
+    fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+    }).then(function(){
+      var h=getHistoria();
+      h.forEach(function(x){if(x.ts===ts)x.wyslane=true;});
+      saveHistoria(h);
+    }).catch(function(){});
+    document.getElementById('ok-ico').textContent='✅';
+    document.getElementById('ok-title').textContent='WYSŁANO!';
+    document.getElementById('ok-msg').textContent='Dane zapisane do Google Sheets!';
+    document.getElementById('ok-offline-info').style.display='none';
+  } else {
+    var ocz=getOczekujace();
+    ocz.push(payload);
+    saveOczekujace(ocz);
+    document.getElementById('ok-ico').textContent='📴';
+    document.getElementById('ok-title').textContent='ZAPISANO!';
+    document.getElementById('ok-msg').textContent='Brak internetu – wyślemy automatycznie!';
+    document.getElementById('ok-offline-info').style.display='block';
   }
-  if(kmk<kms){alert('Km koniec musi być większy!');return;}
-
-  var ids = Object.keys(selectedProgs);
-  if(ids.length===0){alert('Dodaj przynajmniej jeden produkt!');return;}
-
-  var produktyData = [];
-  for(var i=0;i<ids.length;i++){
-    var id = ids[i];
-    var el = document.getElementById('produkt-'+id);
-    if(!el) continue;
-    var pal = document.getElementById('pal-'+id).value;
-    var prog = selectedProgs[id];
-    var zalRZ = parseFloat(document.getElementById('zal-rz-'+id).value);
-    var zal15 = parseFloat(document.getElementById('zal-15-'+id).value);
-    var rozRZ = parseFloat(document.getElementById('roz-rz-'+id).value);
-    var roz15 = parseFloat(document.getElementById('roz-15-'+id).value);
-
-    if(!pal||!prog||isNaN(zalRZ)||isNaN(zal15)||isNaN(rozRZ)||isNaN(roz15)){
-      alert('Uzupełnij wszystkie pola dla Produktu '+id+'!'); return;
-    }
-
-    var progData = getProgData(pal, prog);
-    var wsp = progData ? progData.wsp/100 : 0;
-    var typ = progData ? progData.typ : '';
-
-    // Obliczenia na podstawie typu programu
-    var zalUzyty = typ==='15' ? zal15 : zalRZ;
-    var rozUzyty = typ==='15' ? roz15 : rozRZ;
-    var normaUbytek = +(zalUzyty * wsp).toFixed(2);
-    var roznica = +(zalUzyty - rozUzyty).toFixed(2);
-    var roznicaNetto = +(roznica - normaUbytek).toFixed(2);
-    var status = roznicaNetto < 0 ? 'OSZCZĘDNOŚĆ' : roznicaNetto <= 10 ? 'OK – W NORMIE' : roznicaNetto <= 50 ? 'PONAD NORMĘ' : 'DUŻY UBYTEK';
-
-    produktyData.push({
-      nrProduktu: i+1,
-      paliwo: pal,
-      program: prog,
-      typProg: typ,
-      zaladunek_RZ: zalRZ,
-      zaladunek_15: zal15,
-      rozlane_RZ: rozRZ,
-      rozlane_15: roz15,
-      normaUbytek: normaUbytek,
-      roznica: roznica,
-      roznicaNetto: roznicaNetto,
-      status: status
-    });
-  }
-
-  var payload = {
-    kierowca:kierowca, pojazd:pojazd, data:data, zam:zam, wz:wz,
-    kmStart:kms, kmKoniec:kmk, km:kmk-kms,
-    produkty: produktyData,
-    ts: new Date().toLocaleString('pl-PL')
-  };
-
-  fetch('https://script.google.com/macros/s/AKfycby66lPVes7wEC6K2FWG-d1udV8A4VEkF2eyNEzNvE53zIaZ4T2k167LhkqQ1A7T4aFblQ/exec',{
-    method:'POST', mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  }).catch(function(){});
 
   document.getElementById('form-main').style.display='none';
   document.getElementById('ok-screen').style.display='block';
 }
 
 function resetForm() {
-  document.getElementById('kierowca').value='';
-  document.getElementById('pojazd').value='';
+  ['kierowca','pojazd','zam','wz','kms','kmk','tank-litry','tank-km'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
   document.getElementById('data').valueAsDate=new Date();
-  document.getElementById('zam').value='';
-  document.getElementById('wz').value='';
-  document.getElementById('kms').value='';
-  document.getElementById('kmk').value='';
+  document.getElementById('spalanie-wynik').style.display='none';
+  document.getElementById('val-box').style.display='none';
   document.getElementById('produkty').innerHTML='';
-  produktCount=0;
-  selectedProgs={};
+  fotoData={wz:[],par:[]};
+  renderFotoBox('wz'); renderFotoBox('par');
+  produktCount=0; selectedProgs={};
   document.getElementById('btn-dodaj').style.display='block';
   document.getElementById('form-main').style.display='block';
   document.getElementById('ok-screen').style.display='none';
   dodajProdukt();
+  window.scrollTo(0,0);
 }
 
-function showTab(t) {
-  document.getElementById('tab-form').style.display = t==='form'?'block':'none';
-  document.getElementById('tab-admin').style.display = t==='admin'?'block':'none';
-  document.getElementById('btn-form').style.background = t==='form'?'#1a56db':'transparent';
-  document.getElementById('btn-form').style.color = t==='form'?'#fff':'#94a3b8';
-  document.getElementById('btn-admin').style.background = t==='admin'?'#1a56db':'transparent';
-  document.getElementById('btn-admin').style.color = t==='admin'?'#fff':'#94a3b8';
+// ===== POCZTA (Gmail odbiór) =====
+var POJAZDY_MAIL=[
+  {nr:'1',reg:'PO6S361',gmail:''},
+  {nr:'2',reg:'PKN99959',gmail:''},
+  {nr:'3',reg:'PKN78456',gmail:''},
+  {nr:'4',reg:'PKN67518',gmail:''},
+  {nr:'5',reg:'PKN43062',gmail:''}
+];
+
+function renderMail() {
+  var cont=document.getElementById('mail-list');
+  cont.innerHTML='';
+  POJAZDY_MAIL.forEach(function(p){
+    var div=document.createElement('div');
+    div.className='mail-car';
+    var gmailUrl=p.gmail?'https://mail.google.com/mail/u/0/#search/to%3A'+encodeURIComponent(p.gmail):'https://mail.google.com';
+    div.innerHTML=
+      '<h3>Pojazd '+p.nr+'</h3>'+
+      '<div class="reg">Rejestracja: <b>'+p.reg+'</b>'+(p.gmail?' &nbsp;|&nbsp; '+p.gmail:'')+'</div>'+
+      '<a href="'+gmailUrl+'" target="_blank" class="gmail-btn">📥 OTWÓRZ SKRZYNKĘ '+p.reg+'</a>';
+    cont.appendChild(div);
+  });
+}
+
+// ===== KALKULATOR =====
+function obliczRozliczenie() {
+  var km=parseFloat(document.getElementById('kalk-km').value)||0;
+  var stawka=parseFloat(document.getElementById('kalk-stawka').value)||0;
+  var dni=parseFloat(document.getElementById('kalk-dni').value)||0;
+  var dieta=parseFloat(document.getElementById('kalk-dieta').value)||0;
+  var premia=parseFloat(document.getElementById('kalk-premia').value)||0;
+  var potracenia=parseFloat(document.getElementById('kalk-potracenia').value)||0;
+  var wynikKm=km*stawka;
+  var wynikDiety=dni*dieta;
+  var suma=wynikKm+wynikDiety+premia-potracenia;
+  var res=document.getElementById('kalk-result');
+  res.style.display='block';
+  document.getElementById('kalk-suma').textContent=suma.toFixed(2).replace('.',',')+' zł';
+  document.getElementById('kalk-szczeg').innerHTML=
+    '🛣️ Km: '+km+' × '+stawka+' zł = <b>'+wynikKm.toFixed(2)+' zł</b><br>'+
+    '🍽️ Diety: '+dni+' dni × '+dieta+' zł = <b>'+wynikDiety.toFixed(2)+' zł</b><br>'+
+    (premia?'🏆 Premia: <b>'+premia.toFixed(2)+' zł</b><br>':'')+
+    (potracenia?'➖ Potrącenia: <b>-'+potracenia.toFixed(2)+' zł</b><br>':'');
+}
+
+// ===== ZAKUP PALIWA =====
+function obliczZakup() {
+  var brutto=parseFloat(document.getElementById('zp-brutto').value);
+  var netto=parseFloat(document.getElementById('zp-netto').value);
+  var rz=parseFloat(document.getElementById('zp-rz').value);
+  var wynik=document.getElementById('zp-wynik');
+  if(rz>0&&brutto>0){
+    wynik.style.display='block';
+    document.getElementById('zp-wbr').textContent=(rz*brutto).toFixed(2)+' zł';
+    document.getElementById('zp-wne').textContent=netto>0?(rz*netto).toFixed(2)+' zł':'–';
+    document.getElementById('zp-vat').textContent=(netto>0)?(rz*(brutto-netto)).toFixed(2)+' zł':'–';
+  } else { wynik.style.display='none'; }
+}
+function zapiszZakup(){ alert('✅ Zakup zapisany!'); }
+
+// ===== KOSZTY =====
+var kosztyStale=[], kosztyZmienne=[];
+var KAT_STALE=['OC','AC','Opłata od środków transportu','Leasing','Inne stałe'];
+var KAT_ZMIENNE=['Opłaty e-TOLL','Paliwo (pojazd)','Naprawy','Koszty eksploatacji','Myjnia','Diety','Inne zmienne'];
+
+function dodajKoszt(typ) {
+  var arr=typ==='stale'?kosztyStale:kosztyZmienne;
+  var cont=document.getElementById('koszty-'+typ+'-list');
+  var idx=arr.length;
+  arr.push({kat:'',kwota:0,opis:''});
+  var kats=typ==='stale'?KAT_STALE:KAT_ZMIENNE;
+  var row=document.createElement('div');
+  row.className='koszt-row';
+  row.id='koszt-'+typ+'-'+idx;
+  row.innerHTML=
+    '<select style="flex:1;min-width:120px;" onchange="(typ===\'stale\'?kosztyStale:kosztyZmienne)['+idx+'].kat=this.value">'+
+      '<option value="">Kategoria...</option>'+
+      kats.map(function(k){return '<option>'+k+'</option>';}).join('')+
+    '</select>'+
+    '<input type="number" style="flex:.7;min-width:80px;" placeholder="zł" inputmode="decimal" onchange="(typ===\'stale\'?kosztyStale:kosztyZmienne)['+idx+'].kwota=parseFloat(this.value)||0;przeliczKoszty()">'+
+    '<button class="del-btn" onclick="usunKoszt(\''+typ+'\','+idx+')">✕</button>'+
+    '<input type="text" style="flex:1;min-width:100%;margin-top:4px;" placeholder="Opis / faktura nr...">';
+  cont.appendChild(row);
+}
+
+function usunKoszt(typ,idx) {
+  (typ==='stale'?kosztyStale:kosztyZmienne)[idx]={kat:'',kwota:0,opis:''};
+  var el=document.getElementById('koszt-'+typ+'-'+idx);
+  if(el) el.remove();
+  przeliczKoszty();
+}
+
+function przeliczKoszty() {
+  var ss=kosztyStale.reduce(function(a,b){return a+(b.kwota||0);},0);
+  var sz=kosztyZmienne.reduce(function(a,b){return a+(b.kwota||0);},0);
+  document.getElementById('suma-stale').textContent=ss.toFixed(2).replace('.',',')+' zł';
+  document.getElementById('suma-zmienne').textContent=sz.toFixed(2).replace('.',',')+' zł';
+  document.getElementById('suma-total').textContent=(ss+sz).toFixed(2).replace('.',',')+' zł';
 }
 </script>
+
+<!-- MODAL EDYCJI -->
+
+<div class="modal-overlay" id="edit-modal" style="display:none;">
+  <div class="modal-box">
+    <button class="modal-close" onclick="zamknijEdycje()">✕ Zamknij</button>
+    <div class="hero"><h2>✏️ EDYCJA WPISU</h2><p id="edit-info">Edytujesz wpis z historii</p></div>
+    <input type="hidden" id="edit-ts">
+
+```
+<label>Kierowca</label>
+<select id="edit-kierowca">
+  <option value="">– wybierz –</option>
+  <option>Wojtek</option><option>Jakub</option><option>Szczepan</option>
+</select>
+
+<label>Pojazd</label>
+<select id="edit-pojazd">
+  <option value="">– wybierz –</option>
+  <option value="PO6S361">1 – PO6S361 / PKN472XC – DAF</option>
+  <option value="PKN99959">2 – PKN99959 / PKN294XH</option>
+  <option value="PKN78456">3 – PKN78456</option>
+  <option value="PKN67518">4 – PKN67518 / PKN142XA</option>
+  <option value="PKN43062">5 – PKN43062 – DAF</option>
+</select>
+
+<label>Data trasy</label>
+<input type="date" id="edit-data">
+
+<label>Nr zamówienia</label>
+<input type="text" id="edit-zam" placeholder="ZAM/2025/001">
+
+<label>Nr dokumentu WZ</label>
+<input type="text" id="edit-wz" placeholder="WZ/2025/0123">
+
+<div class="row2" style="margin-top:14px;">
+  <div><label style="margin-top:0">Km start</label><input type="number" id="edit-kms" inputmode="numeric"></div>
+  <div><label style="margin-top:0">Km koniec</label><input type="number" id="edit-kmk" inputmode="numeric"></div>
+</div>
+
+<div style="margin-top:14px;">
+  <div class="card-title" style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#1e3a8a;text-transform:uppercase;border-bottom:2px solid #e2e8f0;padding-bottom:6px;margin-bottom:10px;">⛽ Tankowanie</div>
+  <div class="row2">
+    <div><label style="margin-top:0">Litry</label><input type="number" id="edit-tank-litry" inputmode="decimal"></div>
+    <div><label style="margin-top:0">Km przy tankowaniu</label><input type="number" id="edit-tank-km" inputmode="numeric"></div>
+  </div>
+</div>
+
+<div id="edit-produkty-box" style="margin-top:14px;"></div>
+
+<div style="background:#fef9c3;border-radius:8px;padding:10px;margin-top:14px;font-size:13px;color:#854d0e;">
+  ⚠️ Po zapisaniu wpis zostanie zaktualizowany w historii i ponownie wysłany do Google Sheets.
+</div>
+
+<button class="btn btn-green" onclick="zapiszEdycje()" style="margin-top:12px;">💾 ZAPISZ ZMIANY</button>
+<div style="height:20px;"></div>
+```
+
+  </div>
+</div>
+
+<!-- PIN EKRAN -->
+
+<div class="pin-overlay" id="pin-overlay" style="display:none;">
+  <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+  <h2 id="pin-title">WPISZ PIN</h2>
+  <p id="pin-subtitle">Podaj swój 4-cyfrowy PIN</p>
+  <div class="pin-dots">
+    <div class="pin-dot" id="pd-0"></div>
+    <div class="pin-dot" id="pd-1"></div>
+    <div class="pin-dot" id="pd-2"></div>
+    <div class="pin-dot" id="pd-3"></div>
+  </div>
+  <div class="pin-grid">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinAnuluj()">✕</button>
+  </div>
+  <div class="pin-err" id="pin-err"></div>
+</div>
+
 </body>
 </html>
-    
-  
-     
+
+ 
     
